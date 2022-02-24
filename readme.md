@@ -7,7 +7,8 @@ Or: Stripe Sigma Alternative
   GUI.
 - [Table Dog](https://table.dog) is a CLI that converts your Stripe account to a SQLite database file.
 
-This repo is a web app that runs Datasette and the `tdog` CLI in a single container to give you a fast real-time SQL interface to your Stripe account.
+This repo is a web app that runs Datasette and the `tdog` CLI in a single container to give you a fast real-time SQL
+interface to your Stripe account.
 
 Demo: [https://datasette-stripe.fly.dev/stripe](https://datasette-stripe.fly.dev/stripe).
 
@@ -68,6 +69,8 @@ certificates and OS updates. You give them a single Docker container (this repo)
 
 **4. Set secrets.**
 
+- Create a new restricted key with **read-only** for
+  everything [https://dashboard.stripe.com/apikeys](https://dashboard.stripe.com/apikeys).
 - `fly secrets set STRIPE_SECRET_KEY=rk_test_...`
 - API keys are never hard coded into Docker images or logs.
 - Remember to clear your shell history after setting this.
@@ -94,3 +97,5 @@ certificates and OS updates. You give them a single Docker container (this repo)
 
 - [Fly billing page](https://fly.io/organizations/personal) - Keep an eye on usage here. A single VM can be left on for
   free under the "free tier".
+- If you like the demo but are non-technical, I can set up a Datasette instance for your Stripe account.
+	- Contact me at [table.dog.hq@gmail.com](table.dog.hq@gmail.com). Thanks!
