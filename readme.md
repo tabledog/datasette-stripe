@@ -33,6 +33,7 @@ Demo: [https://datasette-stripe.fly.dev/stripe](https://datasette-stripe.fly.dev
 	- Datasette allows you to use `curl` to get any SQL or GraphQL result set as JSON.
 	- This allows you to do [complex joins very efficiently](https://simonwillison.net/2020/Aug/7/datasette-graphql/) as
 	  they are powered by SQLite underneath.
+	- These APIs can be used from a backend server to query Stripe state without having to handle webhooks or SQL servers and schemas.
 - Mirrors your Stripe API key.
 	- Revoke your key to block all HTTP access to the instance.
 - Very responsive.
