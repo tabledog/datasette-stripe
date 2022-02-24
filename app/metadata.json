@@ -1,0 +1,5 @@
+{
+    "extra_js_urls": [
+        "/static/core.js"
+    ]
+}

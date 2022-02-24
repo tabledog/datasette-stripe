@@ -1,0 +1,14 @@
+app = "datasette-stripe"
+
+
+[mounts]
+  destination = "/data"
+  source = "volume_tdog"
+
+[[services]]
+  internal_port = 3000
+  protocol = "tcp"
+
+  [[services.ports]]
+    handlers = ["tls", "http"]
+    port = "443"
