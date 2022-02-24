@@ -98,4 +98,4 @@ certificates and OS updates. You give them a single Docker container (this repo)
 - [Fly billing page](https://fly.io/organizations/personal) - Keep an eye on usage here. A single VM can be left on for
   free under the "free tier".
 - If you like the demo but are non-technical, I can set up a Datasette instance for your Stripe account.
-	- Contact me at [table.dog.hq@gmail.com](table.dog.hq@gmail.com). Thanks!
+	- Contact me at [table.dog.hq@gmail.com](mailto:table.dog.hq@gmail.com). Thanks!
