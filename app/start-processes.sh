@@ -16,35 +16,6 @@ fi
 echo "Stripe API key ending '${STRIPE_SECRET_KEY: -3}' is valid.";
 
 
-
-# @see https://fly.io/docs/reference/secrets/
-# - Set with `flyctl secrets set STRIPE_SECRET_KEY=rk_test_...`
-read -r -d '' TDOG_CONFIG <<- EOM
-    {
-    "cmd": {
-        "args": {
-            "from": {
-                "stripe": {
-                    "secret_key": "$STRIPE_SECRET_KEY",
-                    "max_requests_per_second": null
-                }
-            },
-            "options": {
-                "watch": true,
-                "poll_freq_ms": 1000
-            },
-            "to": {
-                "sqlite": {
-                    "file": "/data/stripe.sqlite"
-                }
-            }
-        },
-        "fn": "download"
-    },
-    "log": "info"
-}
-EOM
-
 # Volume mounted at /data.
 mkdir -p /data/logs;
 
@@ -55,10 +26,17 @@ mkdir -p /data/logs;
 # - Fly env vars to use to ID log: FLY_REGION/FLY_APP_NAME/FLY_ALLOC_ID.
 
 # Store a copy of logs on volume, put in background (job 1).
+TDOG_CONFIG=$(node /app/get-tdog-config.js);
 tdog --json "$TDOG_CONFIG" >> /data/logs/tdog.txt 2>&1 &
 
 # Wait for `tdog` to create `db.sqlite` (schema only, download begins after).
 sleep 2;
+
+# When: License/config invalid. No connection.
+if [ ! -f /data/stripe.sqlite ]; then
+    echo "Error: stripe.sqlite file does not exist. Check the tdog CLI logs for details.";
+    exit 1;
+fi
 
 # Create FTS tables if they do not exist.
 FTS_TABLES_EXIST=$(sqlite3 /data/stripe.sqlite "SELECT count(*) FROM sqlite_master WHERE type='table' AND name='td_metadata_fts';");
@@ -67,7 +45,8 @@ if [[ $FTS_TABLES_EXIST == '0' ]]; then
     # - Wait until the download has completed, then create the FTS indexes (avoid impacting INSERT performance during the initial download).
     # - First download writes all contained within a single SQLite write transaction.
     # - Datasette will find these indexes and offer a "search" UI.
-    sleep 5 && sqlite3 -cmd ".timeout 2000000000" /data/stripe.sqlite < /app/sql-fts/create-tables-and-triggers.sql &
+    node /app/sql-fts/get-sql-fts.js /data/stripe.sqlite > /app/sql-fts/fts-all-tables.sql;
+    sleep 5 && sqlite3 -cmd ".timeout 2000000000" /data/stripe.sqlite < /app/sql-fts/fts-all-tables.sql &
 fi
 
 

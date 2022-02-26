@@ -7,7 +7,7 @@
 # @see https://fly.io/docs/app-guides/multiple-processes/
 
 # Create volume.
-fly volumes create datasette_stripe_tdog --region lhr --size 1;
+fly volumes create volume_tdog --region lhr --size 1;
 
 # Upload secrets to Fly.io cloud storage.
 # - These are added to the VM instance as environment vars.

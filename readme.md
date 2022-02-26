@@ -38,11 +38,24 @@ Demo: [https://datasette-stripe.fly.dev/stripe](https://datasette-stripe.fly.dev
 	- Revoke your key to block all HTTP access to the instance.
 - Very responsive.
 	- The combination of SQLite and a Fly.io instance at the network "edge" minimize any network hops.
+- Single Docker container.
+	- Can be run on your local laptop or other Docker environment.
 
 ## Security
 
 HTTPS/TLS and HTTP basic auth protects the Datasette instance (and the Stripe/SQLite data loaded into it). See the
 proxy [readme.md](./app/auth-proxy/readme.md) for more details.
+
+## Docker Run
+
+Run a local copy with these commands:
+- `git clone https://github.com/tabledog/datasette-stripe && cd datasette-stripe`
+- `docker build . -t datasette-stripe`
+- `docker run -it -e NODE_ENV='development' -e STRIPE_SECRET_KEY='rk_test...' -v /host/data:/data -p 3000:3000 datasette-stripe`
+- You will now have:
+	- A Datasette instance running at `http://127.0.0.1:3000` (use HTTPS in production).
+	- A SQLite database containing your Stripe account located at `/host/data/stripe.sqlite`.
+- Note: The env var `TDOG_LICENSE` should be set to your [tdog license](https://table.dog/high-detail.html#pricing) for production Stripe accounts.
 
 ## Run this web app for free with Fly.io
 
@@ -73,6 +86,7 @@ certificates and OS updates. You give them a single Docker container (this repo)
 - Create a new restricted key with **read-only** for
   everything [https://dashboard.stripe.com/apikeys](https://dashboard.stripe.com/apikeys).
 - `fly secrets set STRIPE_SECRET_KEY=rk_test_...`
+- `fly secrets set TDOG_LICENSE=...` [tdog license](https://table.dog/high-detail.html#pricing).
 - API keys are never hard coded into Docker images or logs.
 - Remember to clear your shell history after setting this.
 

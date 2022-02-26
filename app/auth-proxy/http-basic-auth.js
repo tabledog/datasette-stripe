@@ -205,7 +205,7 @@ const get_real_ip = (req) => {
 
     const is_proxy_used = ('x-forwarded-for' in req.headers && typeof req.headers['x-forwarded-for'] === "string" && req.headers['x-forwarded-for'].length > 7);
     if (is_prod && !is_proxy_used) {
-        console.error("Could not read client IP. Ensure that the TLS-terminating proxy sets the header x-forwarded-for.");
+        console.error("Could not read client IP. Ensure that the TLS-terminating proxy sets the header x-forwarded-for. In dev or local-only mode, set NODE_ENV=development to ignore this error (traffic will NOT be encrypted; password exposed to network).");
         process.exit(1);
     }
 
@@ -270,6 +270,7 @@ const run_auth_checks = (client_req, client_res, ip) => {
 const health_check = async (client_req, client_res, ip) => {
     let datasette_server = false;
     let tdog_cli_heartbeat = false;
+    let sqlite_db_integrity_check = false;
 
 
     // Used to attach health monitoring (SMS admin on issue, graph of historical uptime records).
@@ -283,7 +284,7 @@ const health_check = async (client_req, client_res, ip) => {
             datasette_server = (a.stdout === '200');
 
 
-            const b = await exec(`sqlite3 ${tdog_db} "select heartbeat_ts from td_metadata limit 1"`);
+            const b = await exec(`sqlite3 ${tdog_db} "SELECT heartbeat_ts FROM td_metadata LIMIT 1"`);
             if (typeof b.stdout === 'string' && b.stdout.length > 4) {
                 const seconds_since_last_events_apply = (((new Date()).getTime() / 1000) - (new Date(b.stdout).getTime() / 1000));
                 // Note: this needs to match the config for polling frequency, and take into account reboots/deploys.
@@ -291,15 +292,18 @@ const health_check = async (client_req, client_res, ip) => {
                     tdog_cli_heartbeat = true;
                 }
             }
+
+            sqlite_db_integrity_check = /^ok/.test((await exec(`sqlite3 ${tdog_db} "PRAGMA integrity_check"`)).stdout);
         } catch (e) {
             console.error(e);
         }
 
         const x = {
-            ok: datasette_server && tdog_cli_heartbeat,
+            ok: datasette_server && tdog_cli_heartbeat && sqlite_db_integrity_check,
             items: {
                 tdog_cli_heartbeat,
-                datasette_server
+                datasette_server,
+                sqlite_db_integrity_check
             }
         };
 
@@ -370,6 +374,10 @@ const on_req = async (client_req, client_res) => {
     };
 
     const proxy_req = http.request(opts, (proxy_res) => {
+        // When using unix socket, Datasette does not log IP of requests.
+        // - Log the IP for use as an audit trail.
+        log_ip(ip, `Forwarding ${client_req.url}`);
+
         client_res.writeHead(proxy_res.statusCode, proxy_res.headers);
 
         proxy_res.pipe(client_res, {

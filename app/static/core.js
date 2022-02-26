@@ -110,12 +110,11 @@ const sign_out = (event = null) => {
             // Trigger the sign in dialog.
             setTimeout(() => {
                 window.location.href = window.location.href;
+                if (is_safari) {
+                    // If the password is saved in macOS/Safari, it must be deleted from the Keychain.
+                    window.open(`https://superuser.com/a/1296581`, "_blank");
+                }
             }, 1000);
-        }
-
-        if (is_safari) {
-            // If the password is saved in macOS/Safari, it must be deleted from the Keychain.
-            window.open(`https://superuser.com/a/1296581`, "_blank");
         }
     };
     x.send();
@@ -161,6 +160,8 @@ const add_tdog_log_to_menu = () => {
         el.appendChild(create_el(`<li><a href="#" onclick="sign_out(event)">Sign out</a></li>`));
     }
 
+    const ft = document.querySelector("footer.ft");
+    ft.innerHTML = `${ft.innerHTML} & <a href="https://github.com/tabledog/datasette-stripe" title="Table Dog">tdog</a>`;
 };
 
 
