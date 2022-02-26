@@ -22,7 +22,7 @@ Demo: [https://datasette-stripe.fly.dev/stripe](https://datasette-stripe.fly.dev
 	- Share queries as URLs with your team.
 	- Export tables to Excel.
 - Snapshot your SQLite database.
-	- Download with `curl`, HTTP basic auth mirrors Stripes API.
+	- Download with `curl` and HTTP basic auth.
 	- Save to file based storage (Dropbox etc) so that you can reproduce query results.
 	- Use a local DB GUI.
 	- Query using Python or another language.
@@ -35,6 +35,7 @@ Demo: [https://datasette-stripe.fly.dev/stripe](https://datasette-stripe.fly.dev
 	  they are powered by SQLite underneath.
 	- These APIs can be used from a backend server to query Stripe state without having to handle webhooks or SQL servers and schemas.
 - Mirrors your Stripe API key.
+	- Sign in to the Datasette instance with HTTP basic auth username=`{STRIPE_SECRET_KEY}`, password=``.
 	- Revoke your key to block all HTTP access to the instance.
 - Very responsive.
 	- The combination of SQLite and a Fly.io instance at the network "edge" minimize any network hops.
