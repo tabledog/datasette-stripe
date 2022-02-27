@@ -22,6 +22,7 @@ const target = {
 
 const tdog_log_file = '/data/logs/tdog.txt';
 const tdog_db = '/data/stripe.sqlite';
+const incorrect_pw_guesses_json_file = '/data/incorrect-pw-guesses.json';
 
 
 let node_env = "production";
@@ -30,6 +31,16 @@ if ("NODE_ENV" in process.env) {
         node_env = process.env["NODE_ENV"];
     }
 }
+
+// When: Setting up a demo of test data. Another auth scheme is used (wrapped by another proxy).
+let http_basic_auth_enabled = true;
+if ("HTTP_BASIC_AUTH_ENABLED" in process.env) {
+    const v = process.env["HTTP_BASIC_AUTH_ENABLED"];
+    if (/^(0|1)$/.test(v)) {
+        http_basic_auth_enabled = (v === "1");
+    }
+}
+
 
 const is_dev = node_env === "development";
 const is_prod = node_env === "production";
@@ -59,12 +70,26 @@ const get_stripe_key = () => {
 
 const get_today = () => (new Date().toISOString().slice(0, 10));
 
-const guesses = {
-    // Today, format yyyy-mm-dd
-    date: get_today(),
-    total_guesses: 0,
-    ips: {}
+const init_guesses = () => {
+
+    // Persist guess data in the case of an attacker crashing the Node process (in RAM guess counts would be reset).
+    if (fs.existsSync(incorrect_pw_guesses_json_file)) {
+        const x = JSON.parse(fs.readFileSync(incorrect_pw_guesses_json_file, {encoding: 'utf8'}));
+        if (x.date === get_today()) {
+            return x;
+        }
+    }
+
+    return {
+        // Today, format yyyy-mm-dd
+        date: get_today(),
+        total_guesses: 0,
+        ips: {}
+    }
 };
+
+const guesses = init_guesses();
+
 
 const get_count_incorrect_guesses_for_ip_today = (ip) => {
     const today = get_today();
@@ -83,6 +108,8 @@ const get_count_incorrect_guesses_for_ip_today = (ip) => {
     return 0;
 };
 
+let req_count_since_last_fsync = 0;
+
 const increment_guess_count_for_ip = (ip) => {
     if (!(ip in guesses.ips)) {
         guesses.ips[ip] = {
@@ -91,6 +118,9 @@ const increment_guess_count_for_ip = (ip) => {
     }
     guesses.total_guesses++;
     guesses.ips[ip].guess_count++;
+
+    // Can be 20ms per write.
+    fs.writeFileSync(incorrect_pw_guesses_json_file, JSON.stringify(guesses, null, 4));
 }
 
 const to_auth = (u, p) => {
@@ -323,9 +353,11 @@ const on_req = async (client_req, client_res) => {
         return;
     }
 
-    const {result_sent} = run_auth_checks(client_req, client_res, ip);
-    if (result_sent) {
-        return;
+    if (http_basic_auth_enabled) {
+        const {result_sent} = run_auth_checks(client_req, client_res, ip);
+        if (result_sent) {
+            return;
+        }
     }
     // If no 401 response at this stage, user has authenticated successfully.
 

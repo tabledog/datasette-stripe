@@ -36,7 +36,7 @@ window.on_id_click = (e) => {
 // E.g.
 // - sub_sched_1JjpgUJo6Ja94JKPoY0NKwgB
 // - rcpt_KmF4yOeNTb1bPiL1OxF8MzIuzZyIred
-const id_re = /\b([a-z]{2,6}_(?:[a-z]{2,6}_)?(?=.{10,40}[A-Z])[a-zA-Z\d]{10,40})\b/g;
+const id_re = /\b([a-z]{2,6}_(?:[a-z]{2,6}_)?(?=.{1,40}[A-Z])[a-zA-Z\d]{10,40})\b/g;
 
 const td_replace_ids_with_links = (el) => {
     if (!("querySelectorAll" in el)) {

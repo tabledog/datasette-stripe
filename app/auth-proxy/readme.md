@@ -31,16 +31,6 @@ HTTP API examples:
 - GraphQL request, JSON response.
 - Backup URL, plain text/SQL dump.
 
-## Assumptions
-
-- Single server that is always on.
-	- State stored in RAM; rebooting the process clears the state.
-	- If the process crashes, the Fly VM will reboot which will slow the guess rate by at least 10s per guess.
-		- A process manager that "fast-restarts" the process on fail would be an issue (a fix would be to persist the
-		  guess state to disk).
-	- Will not work with Cloud Run or other "scale out" container schedulers (single instance needed for SQLite db
-	  anyway).
-
 # Future changes
 
 - Write in Golang.
