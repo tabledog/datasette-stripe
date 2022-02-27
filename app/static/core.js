@@ -161,7 +161,7 @@ const add_tdog_log_to_menu = () => {
     }
 
     const ft = document.querySelector("footer.ft");
-    ft.innerHTML = `${ft.innerHTML} & <a href="https://github.com/tabledog/datasette-stripe" title="Table Dog">tdog</a>`;
+    ft.innerHTML = ft.innerHTML.replace(`Datasette</a>`, `Datasette</a> & <a href="https://github.com/tabledog/datasette-stripe" title="Table Dog">tdog</a>`) ;
 };
 
 
