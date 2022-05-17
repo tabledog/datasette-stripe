@@ -18,8 +18,8 @@ RUN curl --output node.tar.xz https://nodejs.org/dist/v16.14.0/node-v16.14.0-lin
 ENV PATH="/usr/local/lib/nodejs/node-v16.14.0-linux-x64/bin:${PATH}"
 
 # Install tdog
-RUN (cd ${HOME} && curl -O https://raw.githubusercontent.com/tabledog/tdog/0.4.0/archive/0.4.0/packages/apt-get/tdog_0.4.0-1_amd64.deb);
-RUN apt-get install --yes -f ~/tdog_0.4.0-1_amd64.deb;
+RUN curl -L --output /usr/local/bin/tdog https://github.com/tabledog/tdog-cli/releases/latest/download/tdog-x86_64-unknown-linux-gnu;
+RUN chmod +x /usr/local/bin/tdog && /usr/local/bin/tdog --version;
 
 
 # Will be replaced with a volume at runtime.

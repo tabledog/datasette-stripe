@@ -5,7 +5,7 @@ Or: Stripe Sigma Alternative
 - [Datasette](https://datasette.io/) is a web GUI for exploring SQLite datasets.
 - [Stripe](https://stripe.com/) handles online payments. [Sigma](https://stripe.com/sigma) is their SQL analytics web
   GUI.
-- [Table Dog](https://table.dog) is a CLI that converts your Stripe account to a SQLite database file.
+- [Table Dog](https://github.com/tabledog/tdog-cli) is a CLI that converts your Stripe account to a SQLite database file. [Sponsor development](https://github.com/sponsors/emadda).
 
 This repo is a web app that runs Datasette and the `tdog` CLI in a single container to give you a fast real-time SQL
 interface to your Stripe account.
@@ -56,7 +56,6 @@ Run a local copy with these commands:
 - You will now have:
 	- A Datasette instance running at `http://127.0.0.1:3000` (use HTTPS in production).
 	- A SQLite database containing your Stripe account located at `/host/data/stripe.sqlite`.
-- Note: The env var `TDOG_LICENSE` should be set to your [tdog license](https://table.dog/high-detail.html#pricing) for production Stripe accounts.
 
 ## Run this web app for free with Fly.io
 
@@ -87,7 +86,6 @@ certificates and OS updates. You give them a single Docker container (this repo)
 - Create a new restricted key with **read-only** for
   everything [https://dashboard.stripe.com/apikeys](https://dashboard.stripe.com/apikeys).
 - `fly secrets set STRIPE_SECRET_KEY=rk_test_...`
-- `fly secrets set TDOG_LICENSE=...` [tdog license](https://table.dog/high-detail.html#pricing).
 - API keys are never hard coded into Docker images or logs.
 - Remember to clear your shell history after setting this.
 

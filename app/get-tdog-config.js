@@ -2,8 +2,7 @@
 // - Set with `flyctl secrets set STRIPE_SECRET_KEY=rk_test_...`
 
 const {
-    STRIPE_SECRET_KEY: secret_key = null,
-    TDOG_LICENSE: tdog_license = null,
+    STRIPE_SECRET_KEY: secret_key = null
 } = process.env;
 
 
